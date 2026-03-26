@@ -3,6 +3,7 @@ pipeline {
 
   options {
     timestamps()
+    skipDefaultCheckout(true)
   }
 
   parameters {
@@ -18,9 +19,13 @@ pipeline {
   }
 
   stages {
-    stage('Checkout') {
+    stage('Sync Workspace') {
       steps {
-        checkout scm
+        sh '''
+          set -eu
+          rm -rf ./* ./.??* || true
+          cp -a /workspace/smartcouriera/. .
+        '''
       }
     }
 
