@@ -13,12 +13,6 @@ pipeline {
     )
   }
 
-  tools {
-    jdk 'jdk21'
-    maven 'maven-3.9'
-    nodejs 'node24'
-  }
-
   environment {
     APP_NAME = 'smartcourier'
   }
