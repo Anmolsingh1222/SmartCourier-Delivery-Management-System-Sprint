@@ -1,0 +1,123 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: smartcourier-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: smartcourier
+      MYSQL_PASSWORD: smartcourier
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  eureka-server:
+    build:
+      context: ..
+      dockerfile: services/eureka-server/Dockerfile
+    ports:
+      - "8762:8761"
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: services/auth-service/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: smartcourier
+      MYSQL_PASSWORD: smartcourier
+      JWT_SECRET: smartcourier-super-secret-key-change-in-prod-32-plus-bytes
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  delivery-service:
+    build:
+      context: ..
+      dockerfile: services/delivery-service/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: smartcourier
+      MYSQL_PASSWORD: smartcourier
+      TRACKING_SERVICE_URL: http://tracking-service:8083
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      tracking-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+
+  tracking-service:
+    build:
+      context: ..
+      dockerfile: services/tracking-service/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: smartcourier
+      MYSQL_PASSWORD: smartcourier
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  admin-service:
+    build:
+      context: ..
+      dockerfile: services/admin-service/Dockerfile
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: smartcourier
+      MYSQL_PASSWORD: smartcourier
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: services/api-gateway/Dockerfile
+    ports:
+      - "8088:8080"
+    environment:
+      JWT_SECRET: smartcourier-super-secret-key-change-in-prod-32-plus-bytes
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - auth-service
+      - delivery-service
+      - tracking-service
+      - admin-service
+
+  web:
+    build:
+      context: ../frontend/web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /gateway
+    ports:
+      - "5174:80"
+    depends_on:
+      - api-gateway
+
+volumes:
+  mysql_data:

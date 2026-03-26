@@ -1,0 +1,142 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: smartcourier-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  eureka-server:
+    build:
+      context: ..
+      dockerfile: services/eureka-server/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  auth-service:
+    build:
+      context: ..
+      dockerfile: services/auth-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      BOOTSTRAP_ADMIN_ENABLED: ${BOOTSTRAP_ADMIN_ENABLED}
+      BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  delivery-service:
+    build:
+      context: ..
+      dockerfile: services/delivery-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      TRACKING_SERVICE_URL: http://tracking-service:8083
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      tracking-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+
+  tracking-service:
+    build:
+      context: ..
+      dockerfile: services/tracking-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  admin-service:
+    build:
+      context: ..
+      dockerfile: services/admin-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_APP_USER}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: services/api-gateway/Dockerfile
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: ${JWT_SECRET}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      ALLOWED_ORIGIN_PATTERNS: ${ALLOWED_ORIGIN_PATTERNS}
+    depends_on:
+      - eureka-server
+      - auth-service
+      - delivery-service
+      - tracking-service
+      - admin-service
+
+  web:
+    build:
+      context: ../frontend/web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+
+volumes:
+  mysql_data:

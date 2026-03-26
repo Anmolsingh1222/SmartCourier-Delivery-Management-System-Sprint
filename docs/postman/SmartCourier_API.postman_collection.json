@@ -1,0 +1,828 @@
+{
+    "info":  {
+                 "name":  "SmartCourier API",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+                 "description":  "SmartCourier gateway APIs with JWT token flow."
+             },
+    "item":  [
+                 {
+                     "name":  "Auth",
+                     "item":  [
+                                  {
+                                      "name":  "Signup",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@smartcourier.local\",\n  \"password\": \"Password@123\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/signup"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Login",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const json = pm.response.json();",
+                                                                                    "if (json.accessToken) pm.environment.set(\u0027accessToken\u0027, json.accessToken);",
+                                                                                    "if (json.refreshToken) pm.environment.set(\u0027refreshToken\u0027, json.refreshToken);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"email\": \"admin@smartcourier.local\",\n  \"password\": \"Admin@12345\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/login"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Refresh",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/refresh"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Me",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/auth/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Profile",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Updated User\",\n  \"email\": \"updated.user@smartcourier.local\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/me"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Password",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"currentPassword\": \"Password@123\",\n  \"newPassword\": \"Password@456\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/password"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Roles",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/gateway/auth/roles"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Logout",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/auth/logout"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Delivery",
+                     "item":  [
+                                  {
+                                      "name":  "Create Delivery",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const json = pm.response.json();",
+                                                                                    "if (json.id) pm.environment.set(\u0027deliveryId\u0027, json.id);",
+                                                                                    "if (json.trackingNumber) pm.environment.set(\u0027trackingNumber\u0027, json.trackingNumber);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"senderName\": \"Sender\",\n  \"receiverName\": \"Receiver\",\n  \"receiverPhone\": \"9999999999\",\n  \"pickupAddress\": \"Address A\",\n  \"destinationAddress\": \"Address B\",\n  \"packageWeightKg\": 2.2,\n  \"packageType\": \"BOX\",\n  \"serviceType\": \"STANDARD\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/deliveries"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "My Deliveries",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/my"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Get Delivery",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update Delivery",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"receiverName\": \"New Receiver\",\n  \"receiverPhone\": \"8888888888\",\n  \"destinationAddress\": \"Address C\",\n  \"packageWeightKg\": 3.4,\n  \"packageType\": \"FRAGILE\",\n  \"serviceType\": \"EXPRESS\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Book Delivery",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/book"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Schedule Pickup",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"pickupSlot\": \"2026-03-25 10:00-12:00\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/pickup/schedule"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Reschedule Pickup",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"pickupSlot\": \"2026-03-25 14:00-16:00\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/pickup/reschedule"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delivery Price",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/price"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Estimate Price",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"packageWeightKg\": 4.5,\n  \"serviceType\": \"INTERNATIONAL\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/estimate"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark Picked Up",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/status/picked-up"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark In Transit",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/status/in-transit"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark Out For Delivery",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/status/out-for-delivery"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Mark Delivered",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/status/delivered"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Search Deliveries",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/search?q=SC\u0026status=BOOKED"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Cancel Delivery",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}/cancel"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delete Delivery",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/deliveries/{{deliveryId}}"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Tracking",
+                     "item":  [
+                                  {
+                                      "name":  "Track by Number",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{trackingNumber}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Tracking Events",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{trackingNumber}}/events"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Create Tracking Event",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"deliveryId\": {{deliveryId}},\n  \"trackingNumber\": \"{{trackingNumber}}\",\n  \"eventCode\": \"CUSTOM_EVENT\",\n  \"description\": \"Manual tracking event\",\n  \"eventTime\": \"2026-03-24T10:00:00Z\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/tracking/events"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Upload Document",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const json = pm.response.json(); if (json.id) pm.environment.set(\u0027docId\u0027, json.id);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"deliveryId\": {{deliveryId}},\n  \"trackingNumber\": \"{{trackingNumber}}\",\n  \"fileName\": \"invoice.pdf\",\n  \"fileType\": \"application/pdf\",\n  \"fileUrl\": \"https://example.com/invoice.pdf\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/tracking/documents/upload"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Get Document",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/documents/{{docId}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delete Document",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/documents/{{docId}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Create Proof",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"proofType\": \"SIGNATURE\",\n  \"proofUrl\": \"https://example.com/signature.png\",\n  \"recipientName\": \"Receiver\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{deliveryId}}/proof"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Get Proof",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{deliveryId}}/proof"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Download Proof",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{deliveryId}}/proof/download"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Timeline",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{deliveryId}}/timeline"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Latest",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/{{deliveryId}}/latest"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Tracking Health",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/tracking/health"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Admin",
+                     "item":  [
+                                  {
+                                      "name":  "Dashboard",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/dashboard"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Admin Deliveries",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/deliveries"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Create Exception",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"deliveryId\": {{deliveryId}},\n  \"status\": \"DELAYED\",\n  \"reason\": \"Weather disruption\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/admin/deliveries/{{deliveryId}}/exception"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Delivery Exception Details",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/deliveries/{{deliveryId}}"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Resolve Exception",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"resolution\": \"Re-routed to backup hub\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/admin/deliveries/{{deliveryId}}/resolve"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Reports",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/reports"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Daily Report",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/reports/daily"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "SLA Report",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/reports/sla"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "List Users",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/users"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Update User Role",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"role\": \"ADMIN\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/admin/users/1/role"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "List Hubs",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  "{{baseUrl}}/gateway/admin/hubs"
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Create Hub",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{accessToken}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"code\": \"BLR-01\",\n  \"name\": \"Bangalore Main Hub\",\n  \"city\": \"Bengaluru\"\n}"
+                                                               },
+                                                      "url":  "{{baseUrl}}/gateway/admin/hubs"
+                                                  }
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Gateway",
+                     "item":  [
+                                  {
+                                      "name":  "Gateway Services (Public)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "url":  "{{baseUrl}}/gateway/services"
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
+}

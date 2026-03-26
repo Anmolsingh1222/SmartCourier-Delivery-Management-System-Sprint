@@ -1,0 +1,46 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${MYSQL_USER:smartcourier}
+    password: ${MYSQL_PASSWORD:smartcourier}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:smartcourier-super-secret-key-change-in-prod-32-plus-bytes}
+    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:3600}
+    refresh-ttl-seconds: ${JWT_REFRESH_TTL_SECONDS:2592000}
+
+bootstrap:
+  admin:
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:true}
+    name: ${BOOTSTRAP_ADMIN_NAME:Platform Admin}
+    email: ${BOOTSTRAP_ADMIN_EMAIL:admin@smartcourier.local}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:Admin@12345}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

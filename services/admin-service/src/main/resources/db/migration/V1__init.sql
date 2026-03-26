@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS hubs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(32) NOT NULL UNIQUE,
+    name VARCHAR(128) NOT NULL,
+    city VARCHAR(128) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+CREATE TABLE IF NOT EXISTS admin_users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(32) NOT NULL,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+);
+
+CREATE TABLE IF NOT EXISTS delivery_exceptions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    delivery_id BIGINT NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    reason VARCHAR(500) NOT NULL,
+    resolution VARCHAR(500) NOT NULL DEFAULT '',
+    resolved BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    resolved_at DATETIME(3)
+);
+
+INSERT INTO admin_users(email, role) VALUES
+    ('ops@smartcourier.local', 'ADMIN'),
+    ('manager@smartcourier.local', 'ADMIN')
+ON DUPLICATE KEY UPDATE role = VALUES(role);
