@@ -39,6 +39,8 @@ services:
   sonarqube-db:
     image: postgres:16-alpine
     container_name: smartcourier-sonarqube-db
+    profiles:
+      - quality
     restart: unless-stopped
     environment:
       POSTGRES_DB: sonarqube
@@ -50,6 +52,8 @@ services:
   sonarqube:
     image: sonarqube:9.9-community
     container_name: smartcourier-sonarqube
+    profiles:
+      - quality
     restart: unless-stopped
     depends_on:
       - sonarqube-db

@@ -74,6 +74,18 @@ function Invoke-WithRetry {
     throw $FailureMessage
 }
 
+function Is-Service-Running {
+    param(
+        [string]$ServiceName
+    )
+
+    $runningServices = docker compose -f $ComposeFile ps --services --filter status=running 2>$null
+    if (-not $runningServices) {
+        return $false
+    }
+    return @($runningServices) -contains $ServiceName
+}
+
 Write-Host ""
 Write-Host "SmartCourier Health Check"
 Write-Host "Timestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
@@ -148,18 +160,22 @@ if (-not $SkipObservabilityCheck) {
         "HTTP $statusCode"
     }
 
-    Run-Check "SonarQube API reachable" {
-        $statusText = Invoke-WithRetry -TimeoutSeconds $StartupTimeoutSeconds -IntervalSeconds $PollIntervalSeconds -FailureMessage "SonarQube status API did not become reachable in time" -Action {
-            $resp = Invoke-RestMethod -Uri $SonarQubeStatusUrl -TimeoutSec 20
-            if (-not $resp.status) {
-                throw "status field missing"
+    if (Is-Service-Running -ServiceName "sonarqube") {
+        Run-Check "SonarQube API reachable" {
+            $statusText = Invoke-WithRetry -TimeoutSeconds $StartupTimeoutSeconds -IntervalSeconds $PollIntervalSeconds -FailureMessage "SonarQube status API did not become reachable in time" -Action {
+                $resp = Invoke-RestMethod -Uri $SonarQubeStatusUrl -TimeoutSec 20
+                if (-not $resp.status) {
+                    throw "status field missing"
+                }
+                if ($resp.status -eq "DOWN") {
+                    throw "status is DOWN"
+                }
+                return $resp.status
             }
-            if ($resp.status -eq "DOWN") {
-                throw "status is DOWN"
-            }
-            return $resp.status
+            "status=$statusText"
         }
-        "status=$statusText"
+    } else {
+        Add-Result -Name "SonarQube API reachable" -Status "PASS" -Details "Skipped (sonarqube service not running; start with --profile quality)"
     }
 }
 

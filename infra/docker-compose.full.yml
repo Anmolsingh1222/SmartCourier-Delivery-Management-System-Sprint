@@ -38,6 +38,8 @@ services:
   sonarqube-db:
     image: postgres:16-alpine
     container_name: smartcourier-sonarqube-db
+    profiles:
+      - quality
     environment:
       POSTGRES_DB: sonarqube
       POSTGRES_USER: sonar
@@ -48,6 +50,8 @@ services:
   sonarqube:
     image: sonarqube:9.9-community
     container_name: smartcourier-sonarqube
+    profiles:
+      - quality
     depends_on:
       - sonarqube-db
     environment:

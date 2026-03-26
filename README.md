@@ -21,6 +21,12 @@ React frontend + Spring Boot microservices + Spring Cloud Gateway + Eureka Disco
 docker compose -f infra/docker-compose.full.yml up --build
 ```
 
+SonarQube runs under optional `quality` profile (recommended separately because it is memory-heavy):
+
+```powershell
+docker compose -f infra/docker-compose.full.yml --profile quality up -d sonarqube-db sonarqube
+```
+
 ## Access URLs
 
 - Frontend: `http://localhost:5174`
@@ -103,6 +109,12 @@ Copy-Item infra/.env.prod.example infra/.env.prod
 
 ```powershell
 docker compose --env-file infra/.env.prod -f infra/docker-compose.prod.yml up --build -d
+```
+
+To start SonarQube in production mode:
+
+```powershell
+docker compose --env-file infra/.env.prod -f infra/docker-compose.prod.yml --profile quality up -d sonarqube-db sonarqube
 ```
 
 4. Production entrypoint:
