@@ -70,7 +70,7 @@ pipeline {
   post {
     always {
       archiveArtifacts artifacts: 'frontend/web/dist/**', allowEmptyArchive: true
-      junit '**/target/surefire-reports/*.xml'
+      junit testResults: '**/target/surefire-reports/*.xml, **/target/failsafe-reports/*.xml', allowEmptyResults: true
     }
   }
 }
