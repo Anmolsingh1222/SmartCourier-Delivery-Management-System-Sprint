@@ -16,6 +16,54 @@ services:
       timeout: 5s
       retries: 12
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: smartcourier-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  zipkin:
+    image: openzipkin/zipkin:2.24
+    container_name: smartcourier-zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+
+  sonarqube-db:
+    image: postgres:16-alpine
+    container_name: smartcourier-sonarqube-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sonarqube
+      POSTGRES_USER: ${SONAR_DB_USER}
+      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD}
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+
+  sonarqube:
+    image: sonarqube:9.9-community
+    container_name: smartcourier-sonarqube
+    restart: unless-stopped
+    depends_on:
+      - sonarqube-db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
+      SONAR_JDBC_USERNAME: ${SONAR_DB_USER}
+      SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD}
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
   eureka-server:
     build:
       context: ..
@@ -23,6 +71,8 @@ services:
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
 
   auth-service:
     build:
@@ -35,6 +85,10 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_APP_USER}
       MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       BOOTSTRAP_ADMIN_ENABLED: ${BOOTSTRAP_ADMIN_ENABLED}
       BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME}
@@ -42,6 +96,8 @@ services:
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD}
       EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -59,9 +115,15 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_APP_USER}
       MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       TRACKING_SERVICE_URL: http://tracking-service:8083
       EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -81,8 +143,14 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_APP_USER}
       MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -100,8 +168,14 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_APP_USER}
       MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED}
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -119,6 +193,12 @@ services:
       EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
       SWAGGER_ENABLED: ${SWAGGER_ENABLED}
       ALLOWED_ORIGIN_PATTERNS: ${ALLOWED_ORIGIN_PATTERNS}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY}
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: ${ZIPKIN_ENDPOINT}
     depends_on:
       - eureka-server
       - auth-service
@@ -140,3 +220,8 @@ services:
 
 volumes:
   mysql_data:
+  rabbitmq_data:
+  sonarqube_db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

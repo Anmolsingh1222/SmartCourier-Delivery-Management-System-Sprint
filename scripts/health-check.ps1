@@ -2,12 +2,16 @@ param(
     [string]$ComposeFile = "infra/docker-compose.full.yml",
     [string]$GatewayBaseUrl = "http://localhost:8088",
     [string]$EurekaUrl = "http://localhost:8762/eureka/apps",
+    [string]$RabbitMqUrl = "http://localhost:15672",
+    [string]$ZipkinUrl = "http://localhost:9411",
+    [string]$SonarQubeStatusUrl = "http://localhost:9000/api/system/status",
     [string]$AdminEmail = "admin@smartcourier.local",
     [string]$AdminPassword = "Admin@12345",
     [string]$MysqlContainer = "smartcourier-mysql",
     [int]$StartupTimeoutSeconds = 420,
     [int]$PollIntervalSeconds = 8,
-    [switch]$SkipDatabaseCheck
+    [switch]$SkipDatabaseCheck,
+    [switch]$SkipObservabilityCheck
 )
 
 $ErrorActionPreference = "Stop"
@@ -121,6 +125,42 @@ Run-Check "Gateway API docs reachable" {
         throw "Expected 200, got $statusCode"
     }
     "HTTP $statusCode"
+}
+
+if (-not $SkipObservabilityCheck) {
+    Run-Check "RabbitMQ UI reachable" {
+        $statusCode = Invoke-WithRetry -TimeoutSeconds $StartupTimeoutSeconds -IntervalSeconds $PollIntervalSeconds -FailureMessage "RabbitMQ UI did not become reachable in time" -Action {
+            (Invoke-WebRequest -UseBasicParsing -Uri $RabbitMqUrl -TimeoutSec 20).StatusCode
+        }
+        if ($statusCode -lt 200 -or $statusCode -ge 400) {
+            throw "Expected 2xx/3xx, got $statusCode"
+        }
+        "HTTP $statusCode"
+    }
+
+    Run-Check "Zipkin UI reachable" {
+        $statusCode = Invoke-WithRetry -TimeoutSeconds $StartupTimeoutSeconds -IntervalSeconds $PollIntervalSeconds -FailureMessage "Zipkin UI did not become reachable in time" -Action {
+            (Invoke-WebRequest -UseBasicParsing -Uri $ZipkinUrl -TimeoutSec 20).StatusCode
+        }
+        if ($statusCode -lt 200 -or $statusCode -ge 400) {
+            throw "Expected 2xx/3xx, got $statusCode"
+        }
+        "HTTP $statusCode"
+    }
+
+    Run-Check "SonarQube API reachable" {
+        $statusText = Invoke-WithRetry -TimeoutSeconds $StartupTimeoutSeconds -IntervalSeconds $PollIntervalSeconds -FailureMessage "SonarQube status API did not become reachable in time" -Action {
+            $resp = Invoke-RestMethod -Uri $SonarQubeStatusUrl -TimeoutSec 20
+            if (-not $resp.status) {
+                throw "status field missing"
+            }
+            if ($resp.status -eq "DOWN") {
+                throw "status is DOWN"
+            }
+            return $resp.status
+        }
+        "status=$statusText"
+    }
 }
 
 Run-Check "Eureka reachable + services registered" {

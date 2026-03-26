@@ -11,6 +11,9 @@ React frontend + Spring Boot microservices + Spring Cloud Gateway + Eureka Disco
 - `tracking-service` (`8083`)
 - `admin-service` (`8084`)
 - `frontend/web` (`5173` dev, `80` in container)
+- `rabbitmq` (`5672`, management `15672`)
+- `zipkin` (`9411`)
+- `sonarqube` (`9000`)
 
 ## One-command full run (dev/demo)
 
@@ -23,6 +26,9 @@ docker compose -f infra/docker-compose.full.yml up --build
 - Frontend: `http://localhost:5174`
 - Eureka Dashboard: `http://localhost:8762`
 - Gateway Base: `http://localhost:8088/gateway`
+- RabbitMQ UI: `http://localhost:15672` (`smartcourier` / `smartcourier`)
+- Zipkin UI: `http://localhost:9411`
+- SonarQube UI: `http://localhost:9000`
 
 ## Swagger/OpenAPI (dev/demo)
 
@@ -67,6 +73,9 @@ Override via env vars:
 - JWT security + role checks (`ADMIN` restrictions enforced in gateway and service layer)
 - Delivery lifecycle emits tracking events automatically.
 - Auth refresh tokens persisted/revoked/rotated.
+- RabbitMQ included for asynchronous messaging workloads.
+- Zipkin included for distributed tracing (`management.zipkin.tracing.endpoint` wiring via compose env).
+- SonarQube + Postgres included for local code-quality scanning.
 - Unit tests added across auth/delivery/tracking/admin core logic.
 - CI workflow added (`.github/workflows/ci.yml`) for backend tests + frontend build.
 
