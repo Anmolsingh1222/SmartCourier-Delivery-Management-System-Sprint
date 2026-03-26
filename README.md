@@ -117,13 +117,13 @@ For production compose, MySQL is intentionally not exposed publicly by default.
 Install plugins:
 - `Pipeline`
 - `Git`
-- `Maven Integration`
-- `NodeJS`
 
-Go to `Manage Jenkins -> Tools` and create tools with exact names:
-- JDK: `jdk21` (Temurin 21)
-- Maven: `maven-3.9` (3.9.x)
-- NodeJS: `node24` (24.x)
+If you are using the provided `jenkins/jenkins:lts` Docker container,
+install required build tools once inside container:
+
+```powershell
+docker exec -u root smartcourier-jenkins sh -lc "apt-get update && apt-get install -y maven nodejs npm && apt-get clean"
+```
 
 ### Create Pipeline Job
 
