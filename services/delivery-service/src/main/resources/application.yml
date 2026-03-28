@@ -18,6 +18,11 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:smartcourier}
+    password: ${SPRING_RABBITMQ_PASSWORD:smartcourier}
 
 eureka:
   client:
