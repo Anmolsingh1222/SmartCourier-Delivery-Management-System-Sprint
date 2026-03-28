@@ -15,7 +15,11 @@ export function LoginPage() {
     try {
       const { data } = await api.post("/auth/login", { email, password });
       storeTokens(data.accessToken, data.refreshToken);
-      navigate("/customer/dashboard");
+      if (String(data?.profile?.role || "").toUpperCase() === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/customer/dashboard");
+      }
     } catch {
       setError("Login failed. Check your credentials.");
     } finally {

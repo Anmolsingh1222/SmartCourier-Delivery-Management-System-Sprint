@@ -1,21 +1,36 @@
 package com.smartcourier.admin.security;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 class RequestContextServiceTest {
 
-    private final RequestContextService requestContextService = new RequestContextService();
+    private final RequestContextService service = new RequestContextService();
 
     @Test
-    void allowsAdminRole() {
-        assertDoesNotThrow(() -> requestContextService.assertAdmin("ADMIN"));
+    void assertAdminPassesForAdminRole() {
+        assertDoesNotThrow(() -> service.assertAdmin("ADMIN"));
     }
 
     @Test
-    void blocksMissingRole() {
-        assertThrows(AccessDeniedException.class, () -> requestContextService.assertAdmin(null));
+    void assertAdminPassesCaseInsensitive() {
+        assertDoesNotThrow(() -> service.assertAdmin("admin"));
+        assertDoesNotThrow(() -> service.assertAdmin("Admin"));
+    }
+
+    @Test
+    void assertAdminThrowsForCustomerRole() {
+        assertThrows(AccessDeniedException.class, () -> service.assertAdmin("CUSTOMER"));
+    }
+
+    @Test
+    void assertAdminThrowsForNullRole() {
+        assertThrows(AccessDeniedException.class, () -> service.assertAdmin(null));
+    }
+
+    @Test
+    void assertAdminThrowsForEmptyRole() {
+        assertThrows(AccessDeniedException.class, () -> service.assertAdmin(""));
     }
 }

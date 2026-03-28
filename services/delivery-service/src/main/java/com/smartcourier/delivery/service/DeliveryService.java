@@ -180,7 +180,7 @@ public class DeliveryService implements DeliveryServicePort {
             if (status != null && !status.isBlank()) {
                 return deliveryRepository.findByStatusOrderByUpdatedAtDesc(DeliveryStatus.valueOf(status.toUpperCase())).stream().map(this::toResponse).toList();
             }
-            return deliveryRepository.findAll().stream().map(this::toResponse).toList();
+            return deliveryRepository.findAllByOrderByUpdatedAtDesc().stream().map(this::toResponse).toList();
         }
 
         List<DeliveryEntity> mine = deliveryRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);

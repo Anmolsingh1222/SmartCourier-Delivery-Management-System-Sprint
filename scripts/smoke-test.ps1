@@ -143,6 +143,8 @@ if ($refreshToken) {
 # Admin checks
 Invoke-Check -Name "Admin users" -Method GET -Path "/api/admin/users" -Headers $authHeaders | Out-Null
 Invoke-Check -Name "Admin hubs" -Method GET -Path "/api/admin/hubs" -Headers $authHeaders | Out-Null
+Invoke-Check -Name "Admin customer deliveries" -Method GET -Path "/api/admin/deliveries/customer" -Headers $authHeaders | Out-Null
+Invoke-Check -Name "Admin delivery exceptions" -Method GET -Path "/api/admin/deliveries" -Headers $authHeaders | Out-Null
 Invoke-Check -Name "Admin reports" -Method GET -Path "/api/admin/reports" -Headers $authHeaders | Out-Null
 Invoke-Check -Name "Admin reports daily" -Method GET -Path "/api/admin/reports/daily" -Headers $authHeaders | Out-Null
 Invoke-Check -Name "Admin reports sla" -Method GET -Path "/api/admin/reports/sla" -Headers $authHeaders | Out-Null

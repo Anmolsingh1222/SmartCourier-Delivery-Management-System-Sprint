@@ -30,6 +30,40 @@ export function getRefreshToken() {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 }
 
+export function getAccessToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+function parseJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".");
+  if (parts.length < 2) {
+    return null;
+  }
+
+  try {
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = atob(payload);
+    return JSON.parse(decoded) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+export function getTokenRole() {
+  const token = getAccessToken();
+  if (!token) {
+    return null;
+  }
+
+  const payload = parseJwtPayload(token);
+  if (!payload) {
+    return null;
+  }
+
+  const role = payload.role;
+  return typeof role === "string" ? role.toUpperCase() : null;
+}
+
 export async function logoutSession() {
   const refreshToken = getRefreshToken();
   if (refreshToken) {

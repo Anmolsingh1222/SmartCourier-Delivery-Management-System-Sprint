@@ -3,6 +3,7 @@ package com.smartcourier.admin.service;
 import com.smartcourier.admin.domain.AdminUserEntity;
 import com.smartcourier.admin.domain.DeliveryExceptionEntity;
 import com.smartcourier.admin.domain.HubEntity;
+import com.smartcourier.admin.web.dto.AdminDeliveryView;
 import com.smartcourier.admin.web.dto.CreateExceptionRequest;
 import com.smartcourier.admin.web.dto.CreateHubRequest;
 import com.smartcourier.admin.web.dto.ResolveExceptionRequest;
@@ -13,6 +14,8 @@ import java.util.Map;
 public interface AdminServicePort {
 
     Map<String, Object> dashboard();
+
+    List<AdminDeliveryView> customerDeliveries();
 
     List<DeliveryExceptionEntity> deliveries();
 

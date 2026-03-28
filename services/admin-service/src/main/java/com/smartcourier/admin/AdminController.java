@@ -5,6 +5,7 @@ import com.smartcourier.admin.domain.DeliveryExceptionEntity;
 import com.smartcourier.admin.domain.HubEntity;
 import com.smartcourier.admin.security.RequestContextService;
 import com.smartcourier.admin.service.AdminServicePort;
+import com.smartcourier.admin.web.dto.AdminDeliveryView;
 import com.smartcourier.admin.web.dto.CreateExceptionRequest;
 import com.smartcourier.admin.web.dto.CreateHubRequest;
 import com.smartcourier.admin.web.dto.ResolveExceptionRequest;
@@ -37,6 +38,13 @@ public class AdminController {
     public Map<String, Object> dashboard(@RequestHeader(value = "X-User-Role", required = false) String roleHeader) {
         requestContextService.assertAdmin(roleHeader);
         return adminService.dashboard();
+    }
+
+    @GetMapping("/deliveries/customer")
+    public List<AdminDeliveryView> customerDeliveries(
+            @RequestHeader(value = "X-User-Role", required = false) String roleHeader) {
+        requestContextService.assertAdmin(roleHeader);
+        return adminService.customerDeliveries();
     }
 
     @GetMapping("/deliveries")

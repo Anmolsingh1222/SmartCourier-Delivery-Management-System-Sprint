@@ -6,6 +6,7 @@ import com.smartcourier.admin.domain.HubEntity;
 import com.smartcourier.admin.repository.AdminUserRepository;
 import com.smartcourier.admin.repository.DeliveryExceptionRepository;
 import com.smartcourier.admin.repository.HubRepository;
+import com.smartcourier.admin.web.dto.AdminDeliveryView;
 import com.smartcourier.admin.web.dto.CreateExceptionRequest;
 import com.smartcourier.admin.web.dto.CreateHubRequest;
 import com.smartcourier.admin.web.dto.ResolveExceptionRequest;
@@ -22,14 +23,17 @@ public class AdminService implements AdminServicePort {
     private final HubRepository hubRepository;
     private final AdminUserRepository adminUserRepository;
     private final DeliveryExceptionRepository deliveryExceptionRepository;
+    private final DeliveryQueryPort deliveryQueryPort;
 
     public AdminService(
             HubRepository hubRepository,
             AdminUserRepository adminUserRepository,
-            DeliveryExceptionRepository deliveryExceptionRepository) {
+            DeliveryExceptionRepository deliveryExceptionRepository,
+            DeliveryQueryPort deliveryQueryPort) {
         this.hubRepository = hubRepository;
         this.adminUserRepository = adminUserRepository;
         this.deliveryExceptionRepository = deliveryExceptionRepository;
+        this.deliveryQueryPort = deliveryQueryPort;
     }
 
     @Override
@@ -37,12 +41,20 @@ public class AdminService implements AdminServicePort {
     public Map<String, Object> dashboard() {
         long hubs = hubRepository.count();
         long users = adminUserRepository.count();
+        long totalDeliveries = deliveryQueryPort.findAllDeliveriesForAdmin().size();
         long openExceptions = deliveryExceptionRepository.findByResolvedFalseOrderByCreatedAtDesc().size();
         return Map.of(
                 "hubs", hubs,
                 "users", users,
+                "totalDeliveries", totalDeliveries,
                 "openExceptions", openExceptions,
                 "generatedAt", Instant.now().toString());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AdminDeliveryView> customerDeliveries() {
+        return deliveryQueryPort.findAllDeliveriesForAdmin();
     }
 
     @Override

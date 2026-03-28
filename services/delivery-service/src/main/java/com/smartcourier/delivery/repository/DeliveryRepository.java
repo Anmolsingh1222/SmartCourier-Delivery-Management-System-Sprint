@@ -10,4 +10,5 @@ public interface DeliveryRepository extends JpaRepository<DeliveryEntity, Long> 
     List<DeliveryEntity> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
     Optional<DeliveryEntity> findByTrackingNumber(String trackingNumber);
     List<DeliveryEntity> findByStatusOrderByUpdatedAtDesc(DeliveryStatus status);
+    List<DeliveryEntity> findAllByOrderByUpdatedAtDesc();
 }
