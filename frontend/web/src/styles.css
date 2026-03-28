@@ -525,3 +525,43 @@ button:disabled { opacity: 0.55; cursor: not-allowed; filter: none; box-shadow: 
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ── Profile Page ── */
+.profile-avatar-block {
+  display: flex; align-items: center; gap: 16px; padding: 8px 0;
+}
+.profile-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #fff; font-size: 1.6rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  box-shadow: 0 4px 14px rgba(14,165,233,0.35); flex-shrink: 0;
+}
+.msg-ok {
+  color: #16a34a; background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: var(--radius-md); padding: 10px 14px; font-size: 0.875rem;
+}
+
+/* ── Hub Management ── */
+.hub-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px; margin-top: 14px;
+}
+.hub-card {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px; background: var(--surface-2);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.hub-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.hub-code {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--brand-glow); color: var(--brand-dark);
+  font-weight: 800; font-size: 0.78rem; letter-spacing: 0.05em;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(14,165,233,0.25); flex-shrink: 0;
+}
+.hub-info { display: flex; flex-direction: column; gap: 2px; }
+.hub-info strong { font-size: 0.875rem; color: var(--text-1); }

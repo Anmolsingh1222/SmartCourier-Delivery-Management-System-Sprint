@@ -9,6 +9,8 @@ import { DeliveryWizardPage } from "./pages/DeliveryWizardPage";
 import { TrackPage } from "./pages/TrackPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { PaymentPage } from "./pages/PaymentPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { HubManagementPage } from "./pages/HubManagementPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getAccessToken, getTokenRole, logoutSession } from "./lib/api";
 
@@ -18,8 +20,10 @@ const NAV_ICONS: Record<string, string> = {
   "/auth/signup": "✨",
   "/track": "📍",
   "/admin/dashboard": "⚡",
+  "/admin/hubs": "🏭",
   "/customer/dashboard": "📊",
   "/customer/deliveries/new": "📦",
+  "/profile": "👤",
 };
 
 function Navbar({ theme, onToggleTheme }: { theme: "light" | "dark"; onToggleTheme: () => void }) {
@@ -38,14 +42,16 @@ function Navbar({ theme, onToggleTheme }: { theme: "light" | "dark"; onToggleThe
     : role === "ADMIN"
     ? [
         { to: "/admin/dashboard", label: "Dashboard" },
+        { to: "/admin/hubs", label: "Hubs" },
         { to: "/customer/deliveries/new", label: "New Shipment" },
-        { to: "/customer/dashboard", label: "Customer View" },
-        { to: "/track", label: "Track Parcel" },
+        { to: "/track", label: "Track" },
+        { to: "/profile", label: "Profile" },
       ]
     : [
         { to: "/customer/dashboard", label: "Dashboard" },
         { to: "/customer/deliveries/new", label: "New Shipment" },
-        { to: "/track", label: "Track Parcel" },
+        { to: "/track", label: "Track" },
+        { to: "/profile", label: "Profile" },
       ];
 
   return (
@@ -180,6 +186,8 @@ export default function App() {
             <Route path="/track/:id" element={<TrackPage />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="ADMIN"><AdminDashboardPage /></ProtectedRoute>} />
             <Route path="/customer/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/admin/hubs" element={<ProtectedRoute requiredRole="ADMIN"><HubManagementPage /></ProtectedRoute>} />
           </Routes>
         </motion.div>
       </main>
