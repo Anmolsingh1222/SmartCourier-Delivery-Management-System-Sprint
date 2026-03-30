@@ -75,11 +75,23 @@ services:
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
 
+  config-server:
+    build:
+      context: ..
+      dockerfile: services/config-server/Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      EUREKA_DEFAULT_ZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+
   auth-service:
     build:
       context: ..
       dockerfile: services/auth-service/Dockerfile
     environment:
+      CONFIG_SERVER_URL: http://config-server:8888
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: smartcourier
@@ -97,12 +109,15 @@ services:
         condition: service_healthy
       eureka-server:
         condition: service_started
+      config-server:
+        condition: service_started
 
   delivery-service:
     build:
       context: ..
       dockerfile: services/delivery-service/Dockerfile
     environment:
+      CONFIG_SERVER_URL: http://config-server:8888
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: smartcourier
@@ -122,12 +137,15 @@ services:
         condition: service_started
       eureka-server:
         condition: service_started
+      config-server:
+        condition: service_started
 
   tracking-service:
     build:
       context: ..
       dockerfile: services/tracking-service/Dockerfile
     environment:
+      CONFIG_SERVER_URL: http://config-server:8888
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: smartcourier
@@ -150,6 +168,7 @@ services:
       context: ..
       dockerfile: services/admin-service/Dockerfile
     environment:
+      CONFIG_SERVER_URL: http://config-server:8888
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: smartcourier
